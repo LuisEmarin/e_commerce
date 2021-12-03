@@ -39,7 +39,6 @@ export const Home = ( props:Props) => {
                             <Link to="/signin" >Sign Out</Link>
                         </li>
                         </AuthCheck>
-										{/* END OF NEW ADDITION */}
                     </ul>
                 </div>
 
