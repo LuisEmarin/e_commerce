@@ -1,12 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from 'react-query';
-import { QueryClient, QueryClientProvider } from 'react-query';
-import { useAuth, AuthCheck } from "reactfire";
 import { Bar } from './components/';
-import {Link} from 'react-router-dom'
-
-
-
 import Item from './components/Item/Item';
 import Cart from './components/Cart/Cart';
 import Drawer from '@material-ui/core/Drawer';
@@ -15,6 +9,11 @@ import Grid from '@material-ui/core/Grid';
 import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
 import Badge from '@material-ui/core/Badge';
 import  {Wrapper,StyledButton} from './App.styles';
+import React from 'react';
+
+
+
+
 export type CartItemType = {
     id: number;
     category: string;
@@ -25,51 +24,35 @@ export type CartItemType = {
     amount: number;
 };
 
-const getProducts = async (): Promise<CartItemType[]> =>
-  await (await fetch('https://fakestoreapi.com/products')).json();
+export const getTotalItems = (items: CartItemType[]) => 
+items.reduce((ack: number, item) => ack + item.amount, 0);
+
+
+
+
 
 const App = () => {
+const getProducts = async (): Promise<CartItemType[]> =>
+await (await fetch('https://fakestoreapi.com/products')).json();
+
 const [cartOpen, setCartOpen] = useState(false);
 const [cartItems, setCartItems] = useState([] as CartItemType[]);
+
+
+
+
+
 const { data, isLoading, error } = useQuery<CartItemType[]>(
 'products',
 getProducts
 );
-<Bar>
-        <div >
-                    <h1 >
-                        <a href="#" >Brand</a>
-                    </h1>
-                    <ul >
-                        <li>
-                            <Link to='/' href="" >Home</Link>
-                        </li>
-                        <AuthCheck fallback={
-                            <li>
-                                <Link to="/signin" >Sign In</Link>
-                            </li>
-                        }>
-                        
-                        <li>
-                            <Link to="/dashboard" >Dashboard</Link>
-                        </li>
-                        <li>
-                            <Link to="/signin" >Sign Out</Link>
-                        </li>
-                        </AuthCheck>
-                    </ul>
-                </div>
 
-        
-        </Bar>
 console.log(data);
 
-const getTotalItems = (items: CartItemType[]) =>
-items.reduce((ack: number, item) => ack + item.amount, 0);
+
 
 const handleAddToCart = (clickedItem: CartItemType) => {
 setCartItems(prev => {
-    // 1. Is the item already added in the cart?
     const isItemInCart = prev.find(item => item.id === clickedItem.id);
 
     if (isItemInCart) {
@@ -79,7 +62,6 @@ setCartItems(prev => {
         : item
     );
     }
-    // First time the item is added
     return [...prev, { ...clickedItem, amount: 1 }];
 });
 };
@@ -101,27 +83,28 @@ if (isLoading) return <LinearProgress />;
 if (error) return <div>Something went wrong ...</div>;
 
 return (
-<Wrapper>
-    <Drawer anchor='right' open={cartOpen} onClose={() => setCartOpen(false)}>
-    <Cart
-        cartItems={cartItems}
-        addToCart={handleAddToCart}
-        removeFromCart={handleRemoveFromCart}
-    />
-    </Drawer>
-    <StyledButton onClick={() => setCartOpen(true)}>
-    <Badge badgeContent={getTotalItems(cartItems)} color='error'>
-        <AddShoppingCartIcon />
-    </Badge>
-    </StyledButton>
-    <Grid container spacing={3}>
-    {data?.map(item => (
-        <Grid item key={item.id} xs={12} sm={4}>
-        <Item item={item} handleAddToCart={handleAddToCart} />
-        </Grid>
-    ))}
-    </Grid>
-</Wrapper>
+    <Wrapper>
+            <Drawer anchor='right' open={cartOpen} onClose={() => setCartOpen(false)}>
+                <Cart
+                    cartItems={cartItems}
+                    addToCart={handleAddToCart}
+                    removeFromCart={handleRemoveFromCart} />
+            </Drawer>
+            <Bar></Bar>
+            {/* <StyledButton onClick={() => setCartOpen(true)}>
+                <Badge badgeContent={getTotalItems(cartItems)} color='error'>
+                    <AddShoppingCartIcon />
+                </Badge>
+            </StyledButton> */}
+            
+            <Grid container spacing={3}>
+                {data?.map(item => (
+                    <Grid item key={item.id} xs={12} sm={4}>
+                        <Item item={item} handleAddToCart={handleAddToCart} />
+                    </Grid>
+                ))}
+            </Grid>
+        </Wrapper>
   );
 };
 

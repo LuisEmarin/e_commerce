@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Drawer as MUIDrawer,
     ListItem,
     List,
-    ListItemIcon,
     ListItemText,
     Theme,
     useTheme,
@@ -14,24 +13,24 @@ import { Drawer as MUIDrawer,
     Typography,
     Divider,
     Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle
-
-} from '@material-ui/core';
+    Dialog} from '@material-ui/core';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import clsx from 'clsx';
-import { RouteComponentProps, withRouter, Switch, Route } from 'react-router';
+import { RouteComponentProps, withRouter } from 'react-router';
 import { SignIn } from '..';
-import { StyledButton } from '../../App.styles';
+import Item from '../Item/Item';
+import Cart from '../Cart/Cart';
+
+import Drawer from '@material-ui/core/Drawer';
+import Grid from '@material-ui/core/Grid';
 import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
 import Badge from '@material-ui/core/Badge';
-import App from '../../App';
+import  {StyledButton} from '../../App.styles';
+import { useQuery } from 'react-query';
+
 
 const drawerWidth = 240; 
 
@@ -71,7 +70,6 @@ const useStyles = makeStyles((theme: Theme) =>
             display: 'flex',
             alignItems: 'center',
             padding: theme.spacing(0,1),
-            // required for content to display below the AppBar
             ...theme.mixins.toolbar,
             justifyContent: 'flex-end'
         },
@@ -118,6 +116,18 @@ interface DashProps{
     location: RouteComponentProps["location"];
     match: RouteComponentProps["match"];
 }
+export type CartItemType = {
+    id: number;
+    category: string;
+    description: string;
+    image: string;
+    price: number;
+    title: string;
+    amount: number;
+};
+export const getTotalItems = (items: CartItemType[]) => 
+items.reduce((ack: number, item) => ack + item.amount, 0);
+
 
 
 export const Bar = withRouter((props:DashProps) =>{
@@ -137,27 +147,72 @@ export const Bar = withRouter((props:DashProps) =>{
 
     const handleDialogClickOpen = () => {
         setDialogOpen(true);
-    }
+    };
 
     const handleDialogClickClose = () => {
         setDialogOpen(false);
-    }
+    };
+
+
+    const getProducts = async (): Promise<CartItemType[]> =>
+await (await fetch('https://fakestoreapi.com/products')).json();
+    const [cartOpen, setCartOpen] = useState(false);
+    const [cartItems, setCartItems] = useState([] as CartItemType[]);
+    const { data, isLoading, error } = useQuery<CartItemType[]>(
+        'products',
+        getProducts
+        );
+        
+
+    const handleAddToCart = (clickedItem: CartItemType) => {
+        setCartItems(prev => {
+            const isItemInCart = prev.find(item => item.id === clickedItem.id);
+        
+            if (isItemInCart) {
+            return prev.map(item =>
+                item.id === clickedItem.id
+                ? { ...item, amount: item.amount + 1 }
+                : item
+            );
+            }
+            return [...prev, { ...clickedItem, amount: 1 }];
+        });
+        };
+        
+        const handleRemoveFromCart = (id: number) => {
+        setCartItems(prev =>
+            prev.reduce((ack, item) => {
+            if (item.id === id) {
+                if (item.amount === 1) return ack;
+                return [...ack, { ...item, amount: item.amount - 1 }];
+            } else {
+                return [...ack, item];
+            }
+            }, [] as CartItemType[])
+        );
+        };
+        
+
+
 
     const itemsList = [
         {
             text: 'Home',
             onClick: () => history.push('/')
         },
+        
+        
         {
-            text: 'Sign In',
-            onClick: () => history.push('/signin')
+            text: 'Shop Now!',
+            onClick: () => history.push('/Bar')
         }
     ];
 
+
     return (
-        <div className={classes.root}>
+        <><div className={classes.root}>
             <CssBaseline />
-            <AppBar 
+            <AppBar
                 position='fixed'
                 className={clsx(classes.appBar, {
                     [classes.appBarShift]: open
@@ -174,26 +229,34 @@ export const Bar = withRouter((props:DashProps) =>{
                         <MenuIcon />
                     </IconButton>
                     <Typography variant='h6' noWrap>
-                        <Button className={classes.simply}href='./'>SimplyParts.com</Button>  
+                        <Button className={classes.simply} href='./'>SimplyShop.com</Button>
                     </Typography>
-                    {/* <StyledButton onClick={() => setCartOpen(true)}>
-                    <Badge badgeContent={getTotalItems(cartItems)} color='error'>
-                    <AddShoppingCartIcon />
-                    </Badge>
-                    </StyledButton>                     */}
-                    
+
+
+                    <Drawer anchor='right' open={cartOpen} onClose={() => setCartOpen(false)}>
+                        <Cart
+                            cartItems={cartItems}
+                            addToCart={handleAddToCart}
+                            removeFromCart={handleRemoveFromCart} />
+                    </Drawer>
+                    <StyledButton onClick={() => setCartOpen(true)}>
+                        <Badge badgeContent={getTotalItems(cartItems)} color='error'>
+                            <AddShoppingCartIcon />
+                        </Badge>
+                    </StyledButton>
+
+
+
                     <Button className={classes.toolbarButton} onClick={handleDialogClickOpen}>Sign In or Register!</Button>
-                        <Dialog className={classes.dialog} open={dialogOpen} onClose={handleDialogClickClose} aria-labelledby="form-dialog-title">
-                            <SignIn>
-                                
-                            <DialogActions>
-                                <Button onClick={handleDialogClickClose} color='primary'>Cancel</Button>
-                                <Button onClick={handleDialogClickClose} color='primary'>Done</Button>
-                            </DialogActions>
-                            </SignIn>
-                        </Dialog>
+                    <Dialog className={classes.dialog} open={dialogOpen} onClose={handleDialogClickClose} aria-labelledby="form-dialog-title">
+                        <SignIn>
+
+
+                        </SignIn>
+                    </Dialog>
                 </Toolbar>
             </AppBar>
+
             <MUIDrawer
                 className={classes.drawer}
                 variant="persistent"
@@ -205,18 +268,18 @@ export const Bar = withRouter((props:DashProps) =>{
             >
                 <div className={classes.drawerHeader}>
                     <IconButton onClick={handleDrawerClose}>
-                        {theme.direction === 'ltr' ? <ChevronLeftIcon />: <ChevronRightIcon />}
+                        {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
                     </IconButton>
                 </div>
                 <Divider />
                 <List>
-                    {itemsList.map((item) =>{
+                    {itemsList.map((item) => {
                         const { text, onClick } = item;
                         return (
                             <ListItem button key={text} onClick={onClick}>
                                 <ListItemText primary={text} />
                             </ListItem>
-                        )
+                        );
                     })}
                 </List>
             </MUIDrawer>
@@ -225,20 +288,22 @@ export const Bar = withRouter((props:DashProps) =>{
             })}>
                 <div className={classes.drawerHeader} />
             </main>
+
         </div>
+        <div>
+        <Grid container spacing={3}>
+        {data?.map(item => (
+            <Grid item key={item.id} xs={12} sm={4}>
+                <Item item={item} handleAddToCart={handleAddToCart} />
+            </Grid>
+        ))}
+        </Grid>
+            </div></>
     )
+
+
+
 })
 
-function setCartOpen(_arg0: boolean): void {
-    throw new Error('Function not implemented.');
-}
 
-
-function getTotalItems(_cartItems: any): import("react").ReactNode {
-    throw new Error('Function not implemented.');
-}
-
-
-function cartItems(_cartItems: any): import("react").ReactNode {
-    throw new Error('Function not implemented.');
-}
+ 

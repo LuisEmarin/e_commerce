@@ -5,7 +5,6 @@ import { Home, Bar, SignIn,Create } from './components';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import reportWebVitals from './reportWebVitals';
-import { store } from './redux/store';
 import { FirebaseAppProvider, AuthCheck } from 'reactfire'; 
 import 'firebase/auth'; 
 import { firebaseConfig } from './firebaseConfig' 
@@ -22,7 +21,7 @@ ReactDOM.render(
       <QueryClientProvider client={client}>
 
     <FirebaseAppProvider firebaseConfig={firebaseConfig}> 
-    <Provider store = { store }>
+    
 
     <Router>
     <Switch>
@@ -51,7 +50,6 @@ ReactDOM.render(
 
           </Switch>
     </Router>
-    </Provider>
     </FirebaseAppProvider>
     </QueryClientProvider>
   </React.StrictMode>,

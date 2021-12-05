@@ -1,11 +1,7 @@
 import React from 'react';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
 import {Snackbar,makeStyles,Container} from '@material-ui/core'
-import { Bar } from '..';
-import {AuthCheck} from 'reactfire';
-import {Link} from 'react-router-dom'
 import {Input} from '../sharedComponents'
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 import { useState } from "react"
@@ -63,7 +59,7 @@ export const Create = withRouter( (props:Create) => {
     }
     return (
         <div>
-        <Bar>
+        {/* <Bar>
         <div >
                     <h1 >
                         <a href="#" >Brand</a>
@@ -89,7 +85,7 @@ export const Create = withRouter( (props:Create) => {
                 </div>
 
         
-        </Bar>
+        </Bar> */}
         <Container maxWidth = 'sm' className={classes.containerStyle}>
                 <Typography className={classes.typographyStyle}>Create your FREE account!</Typography>
                 <form>
@@ -103,7 +99,18 @@ export const Create = withRouter( (props:Create) => {
                 </div>
                 <Button type='submit' variant='contained' color='primary' href='/SignIn'>Submit</Button>
                 </form>
-                
+                <Button href="/App" size="medium" style={{ backgroundColor:'yellow',
+            position: 'fixed',
+            top: 255,
+            right: 450,
+            fontSize: '900',
+            fontWeight: '800',
+            color:'blue',
+            border: '1px solid #ccc',
+        }}>
+                Start Shopping!
+                {/* <Link to='/App' style={{color:'blue'}}> Start Shopping!</Link> */}
+            </Button>
                 <Snackbar message={'Success'} open={open} autoHideDuration={6000} onClose={handleSnackClose} >
                 <Alert onClose={handleSnackClose} severity="success">
                     Successful Sign In - Redirect in 2 secs

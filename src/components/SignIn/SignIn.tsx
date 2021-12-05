@@ -16,7 +16,7 @@ const useStyles = makeStyles({
     googleButton:{
         backgroundColor: 'rgb(15 157 88)',
         marginTop: '1em',
-        marginLeft: '10em',
+        marginLeft: '2em',
         padding: '0',
         color: 'white',
         height: '50px',
@@ -29,7 +29,8 @@ const useStyles = makeStyles({
         display: 'block',
         borderRadius: '1px',
         fontFamily: 'Roboto, arial, sans-serif',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        
     },
     googleLogo:{
         width: '48px',
@@ -51,13 +52,14 @@ const useStyles = makeStyles({
     },
     subStyle:{
         marginTop:"1em",
-        marginLeft:'17em',
+        marginLeft:'7em',
         boxShadow: 'rgb(0 0 0 / 25%) 0px 2px 4px 0px',
-
+        
     },
     buttonStyle:{
-        left:'12rem',
+        left:'4rem',
         marginTop:'1em',
+        
         
         
 
@@ -118,33 +120,11 @@ export const SignIn = withRouter( (props:SignInProps) => {
 
     return (
         <div>
-            <Bar>
-        <div >
-                    <h1 >
-                        <a href="#" >Brand</a>
-                    </h1>
-                    <ul >
-                        <li>
-                            <Link to='/' href="" >Home</Link>
-                        </li>
-                        <AuthCheck fallback={
-                            <li>
-                                <Link to="/signin" >Sign In</Link>
-                            </li>
-                        }>
-                        
-                        <li>
-                            <Link to="/dashboard" >Dashboard</Link>
-                        </li>
-                        <li>
-                            <Link to="/signin" >Sign Out</Link>
-                        </li>
-                        </AuthCheck>
-                    </ul>
-                </div>
+            {/* <Bar>
+        
 
         
-        </Bar>
+        </Bar> */}
             <Container maxWidth = 'sm' className={classes.containerStyle}>
                 <Typography className={classes.typographyStyle}>Sign In Below</Typography>
                 <form>
@@ -165,7 +145,7 @@ export const SignIn = withRouter( (props:SignInProps) => {
 
                 </form>
                 <Button  type='submit' variant='contained' color='primary' href='/'className={classes.subStyle}>Submit</Button>
-
+                
                 
                 <Snackbar message={'Success'} open={open} autoHideDuration={6000} onClose={handleSnackClose} >
                 <Alert onClose={handleSnackClose} severity="success">
